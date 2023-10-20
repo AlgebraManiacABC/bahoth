@@ -16,6 +16,10 @@ else()
 	target_link_libraries(${PROJECT_NAME} "C:/Program Files (x86)/glew/lib/libglew32.dll.a")
 endif()
 
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
+
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
