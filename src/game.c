@@ -1,4 +1,7 @@
 #include "game.h"
+#include "render.h"
+
+float tileWidth = 1.0f;
 
 void gameLoop(SDL_Window *w)
 {
@@ -9,6 +12,8 @@ void gameLoop(SDL_Window *w)
 		if(shouldClose) return;
 
 		glClear(GL_COLOR_BUFFER_BIT);
+		//	Need to send camera position to renderAll eventually
+		renderAll();
 		SDL_GL_SwapWindow(w);
 		SDL_Delay(1000/FPS);
 	}

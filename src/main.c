@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 				INITIAL_WINDOW_W, INITIAL_WINDOW_H, &w, &glContext);
 	if(err)
 	{
-		SDL_Log("Error during initialization: %s\n",whatHappened(err));
+		fprintf(stderr,"Error during intialization: %s\n",getError());
 		return EXIT_FAILURE;
 	}
 

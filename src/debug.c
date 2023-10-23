@@ -3,16 +3,50 @@
 const char * errorMessages[] =
 {
 	"Unknown error!",
-	"Should have checked variableError! Try again!"
+	"Couldn't open file!",
+	"Shader compilation failure!"
 };
 
-const char * variableError;
+char * errorString = NULL;
+errType lastError = ERR_CODE;
+Uint32 lastErrorCode = ERR_UNDEF;
 
-const char * whatHappened(Uint32 errorCode)
+void setError(errType type, ...)
 {
-	if(errorCode == ERR_VARIA)
+	va_list args;
+	va_start(args, type);
+
+	if(type == ERR_CODE)
 	{
-		return variableError;
+		lastErrorCode = va_arg(args,Uint32);
+		va_end(args);
+		lastError = ERR_CODE;
+		return;
 	}
-	return errorMessages[errorCode];
+
+	//	setErrorMesg to the formatted string (second arg)
+	char * fmt = va_arg(args, char *);
+	if(errorString)
+	{
+		free(errorString);
+		errorString = NULL;
+	}
+	vasprintf(&errorString,fmt,args);
+	va_end(args);
+	lastError = ERR_MESG;
+}
+
+const char * getError(void)
+{
+	if(lastError == ERR_CODE)
+	{
+		return errorMessages[lastErrorCode];
+	}
+
+	if(!errorString)
+	{
+		return errorMessages[ERR_UNDEF];
+	}
+
+	return errorString;
 }
