@@ -14,6 +14,15 @@
 
 #define FPS (60.0)
 
+typedef struct tile
+{
+	float x;
+	float z;
+
+}	tile;
+
+extern float tileWidth;
+
 /**
  * Main game loop.
  * 

@@ -30,3 +30,5 @@ else()
 	include_directories("C:/Program Files (x86)/cglm/include")
 	target_link_libraries(${PROJECT_NAME} "C:/Program Files (x86)/cglm/lib/libcglm.dll.a")
 endif()
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror -std=c11 -lm)
