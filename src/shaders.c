@@ -21,7 +21,7 @@ GLuint createShader(const char * shaderFilename, GLenum shaderType)
 	{
 		char info_log[512]={0};
 		glGetShaderInfoLog(shaderID, 512, NULL, info_log);
-		setError(ERR_MESG,"Shader did not compile: %s\nFor reference, here is the source:\n```\n%s\n```\n",info_log,shaderSource);
+		setError(ERR_MESG,"Shader did not compile: %s\nFor reference, here is the source:\n```\n%s\n```",info_log,shaderSource);
 		return 0;
 	}
 	return shaderID;
@@ -43,7 +43,7 @@ GLuint createProgram(size_t shaderCount, ...)
 	if(!success) {
 		char info_log[512]={0};
 		glGetProgramInfoLog(shaderProgram, 512, NULL, info_log);
-		setError(ERR_MESG,"Shader linking failure: %s\n",info_log);
+		setError(ERR_MESG,"Shader linking failure: %s",info_log);
 		return 0;
 	}
 	return shaderProgram;

@@ -18,14 +18,14 @@ int initWindow(Uint32 SDL_initFlags,
 	int err = EXIT_SUCCESS;
 	if( (err = SDL_Init(SDL_initFlags)) )
 	{
-		setError(ERR_MESG,"SDL Initialization error: %s\n",SDL_GetError());
+		setError(ERR_MESG,"SDL Initialization error: %s",SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
 	(*w) = SDL_CreateWindow(winTitle, win_x, win_y, win_w, win_h, SDL_winFlags);
 	if(!(*w))
 	{
-		setError(ERR_MESG,"SDL Window creation failure: %s\n",SDL_GetError());
+		setError(ERR_MESG,"SDL Window creation failure: %s",SDL_GetError());
 		SDL_Quit();
 		return EXIT_FAILURE;
 	}
@@ -33,7 +33,7 @@ int initWindow(Uint32 SDL_initFlags,
 	(*glContext) = SDL_GL_CreateContext(*w);
 	if(!(*glContext))
 	{
-		setError(ERR_MESG,"SDL GL Context creation failure: %s\n",SDL_GetError());
+		setError(ERR_MESG,"SDL GL Context creation failure: %s",SDL_GetError());
 		SDL_DestroyWindow((*w));
 		SDL_Quit();
 		return EXIT_FAILURE;
@@ -42,7 +42,7 @@ int initWindow(Uint32 SDL_initFlags,
 	GLenum glewError = glewInit();
 	if(glewError != GLEW_OK)
 	{
-		setError(ERR_MESG,"Glew initialization failure: %s\n",glewGetErrorString(glewError));
+		setError(ERR_MESG,"Glew initialization failure: %s",glewGetErrorString(glewError));
 		SDL_GL_DeleteContext((*glContext));
 		SDL_DestroyWindow((*w));
 		SDL_Quit();
