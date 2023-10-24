@@ -1,12 +1,23 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include <cglm/cglm.h>
+
+typedef uint32_t Uint32;
 
 typedef struct camera
 {
 	float x;
 	float y;
 	float z;
-	float psi;	// Yaw (lateral rotation - 0 is along xy-plane, facing +x)
-	float theta;// Pitch (vertical rotation - 0 is along xz-plane)
-	//float phi;	// Roll (unimplemented - would not be useful)
+	vec3 pos;
+	float yaw;	// Yaw in radians (rotation about y axis - 0==2pi is facing -z)
+	float pitch;// Pitch in radians (looking up/down - 0 is along xz-plane ("horizon"); -pi/2 <= pitch <= pi/2)
 
 }	camera;
+
+camera initCamera(void);
+
+void moveCamera(camera * cam, Uint32 buttonsHeld);
+
+#endif

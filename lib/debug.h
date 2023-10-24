@@ -31,6 +31,8 @@ typedef uint32_t Uint32;
 #define ERR_UNDEF (0)
 #define ERR_NOFIL (1)
 #define ERR_SHADE (2)
+#define ERR_NULLP (3)
+#define ERR_NOMEM (4)
 
 typedef bool errType;
 #define ERR_CODE (false)

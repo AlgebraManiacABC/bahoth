@@ -8,11 +8,24 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <cglm/cglm.h>
+#include <math.h>
 #include <time.h>
+#include "camera.h"
 
-//typedef struct timespec time_s;
+#define CAMERA_MOVE_LEFT     (0b0000000001)
+#define CAMERA_MOVE_RIGHT    (0b0000000010)
+#define CAMERA_MOVE_FORWARD  (0b0000000100)
+#define CAMERA_MOVE_BACKWARD (0b0000001000)
+#define CAMERA_MOVE_UP       (0b0000010000)
+#define CAMERA_MOVE_DOWN     (0b0000100000)
+#define CAMERA_YAW_LEFT      (0b0001000000)
+#define CAMERA_YAW_RIGHT     (0b0010000000)
+#define CAMERA_PITCH_UP      (0b0100000000)
+#define CAMERA_PITCH_DOWN    (0b1000000000)
 
-#define FPS (60.0)
+#define FPS (60.0f)
+#define CAM_UPS (1.0f)	//	Units per second
+#define CAM_UPF (CAM_UPS/FPS)	//	Units per frame
 
 typedef struct tile
 {
@@ -22,6 +35,8 @@ typedef struct tile
 }	tile;
 
 extern float tileWidth;
+extern GLuint trLoc;
+extern vec3 worldUp;
 
 /**
  * Main game loop.
@@ -34,9 +49,10 @@ void gameLoop(SDL_Window *w);
  * Polls all incoming events through SDL
  * 
  * @param shouldClose Address to a bool which is set if SDL_QUIT (etc) is received
+ * @param cam The camera struct, which will be updated depending on movement
  * 
  * @returns The number of events polled 
  */
-int handleEvents(bool *shouldClose);
+int handleEvents(bool *shouldClose, camera * cam, Uint32 * buttonsHeld);
 
 #endif
