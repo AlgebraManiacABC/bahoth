@@ -1,27 +1,27 @@
 #include "render.h"
 #include "game.h"
 
-void renderAll(GLuint shaderProgram, camera cam, float aspectRatio)
+void renderAll(GLuint shaderProgram, camera cam)
 {
-	renderTable(shaderProgram, cam, aspectRatio);
+	renderTable(shaderProgram, cam);
 	renderUI();
 }
 
-void renderTable(GLuint shaderProgram, camera cam, float aspectRatio)
+void renderTable(GLuint shaderProgram, camera cam)
 {
-	renderTiles(shaderProgram, cam, aspectRatio);
+	renderTiles(shaderProgram, cam);
 	renderPlayerInventories();
 	renderTableExtras();
 }
 //============================//
-void renderTiles(GLuint shaderProgram, camera cam, float aspectRatio)
+void renderTiles(GLuint shaderProgram, camera cam)
 {
 	//	Experimental state of this function!
 	//	Expect most or all of this to be replaced.
-	renderTile(shaderProgram, cam, aspectRatio);
+	renderTile(shaderProgram, cam);
 }
 
-void renderTile(GLuint shaderProgram, camera cam, float aspectRatio)
+void renderTile(GLuint shaderProgram, camera cam)
 {
 	//	Experimental state of this function!
 	//	Expect most or all of this to be replaced.
@@ -67,7 +67,7 @@ void renderTile(GLuint shaderProgram, camera cam, float aspectRatio)
 	};
 
 	glm_look((vec3){cam.x,cam.y,cam.z},dir,worldUp,viewMatrix);
-	glm_perspective(glm_rad(90),aspectRatio,0.1f,100.0f,projectionMatrix);
+	glm_perspective(glm_rad(90),cam.ar,0.1f,100.0f,projectionMatrix);
 	glm_mat4_mul(projectionMatrix,viewMatrix,mvpMatrix);
 	glm_mat4_mul(mvpMatrix,modelMatrix,mvpMatrix);
 	glUniformMatrix4fv(trLoc,1,GL_FALSE,(float*)mvpMatrix);
@@ -83,6 +83,57 @@ void renderTableExtras()
 {
 	return;
 }
+
+void renderSTL(GLuint shaderProgram, camera cam, STL stl)
+{
+	glUseProgram(shaderProgram);
+
+	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
+	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
+	mat4 modelMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_mat4_mul(translationMatrix,rotationMatrix,modelMatrix);
+	mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
+	mat4 projectionMatrix = GLM_MAT4_IDENTITY_INIT;
+	mat4 mvpMatrix = GLM_MAT4_IDENTITY_INIT;
+	vec3 dir =
+	{
+		cosf(cam.pitch) * sinf(cam.yaw),
+		sinf(cam.pitch),
+		cosf(cam.pitch) * cosf(cam.yaw)
+	};
+
+	glm_look((vec3){cam.x,cam.y,cam.z},dir,worldUp,viewMatrix);
+	glm_perspective(glm_rad(90),cam.ar,0.1f,100.0f,projectionMatrix);
+	glm_mat4_mul(projectionMatrix,viewMatrix,mvpMatrix);
+	glm_mat4_mul(mvpMatrix,modelMatrix,mvpMatrix);
+	glUniformMatrix4fv(trLoc,1,GL_FALSE,(float*)mvpMatrix);
+
+	GLuint vertexData;
+	glGenBuffers(1,&vertexData);
+	glBindBuffer(GL_ARRAY_BUFFER,vertexData);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(STL_triangle_s)*(stl->triangleCount),stl->triangles,GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(STL_triangle_s), (void*)(sizeof(vec3)));
+	glEnableVertexAttribArray(0);
+
+	//glDrawArrays(GL_TRIANGLES,0,9438+1599);
+
+	GLuint indices[] = {0,1,2};
+
+	GLuint vertexIndices;
+	glGenBuffers(1,&vertexIndices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vertexIndices);
+
+	for(int i=0; i<(stl->triangleCount>1000?1000:stl->triangleCount); i++)
+	{
+		indices[0] = 0 + (i * 3);
+		indices[1] = 1 + (i * 3);
+		indices[2] = 2 + (i * 3);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
+		glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_INT,NULL);
+	}
+}
+
 //============================//
 
 void renderUI()

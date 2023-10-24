@@ -24,7 +24,7 @@ void gameLoop(SDL_Window *w)
 	//glClearColor(1.0f,1.0f,1.0f,1.0f);
 	trLoc = glGetUniformLocation(sp,"transform");
 
-	camera cam = initCamera();
+	camera cam = initCamera(aspectRatio);
 
 	Uint32 buttonsHeld = (0b0);
 	bool shouldClose = false;
@@ -36,7 +36,8 @@ void gameLoop(SDL_Window *w)
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		//	Need to send camera position to renderAll eventually
-		renderAll(sp,cam,aspectRatio);
+		//renderAll(sp,cam);
+		renderSTL(sp,cam,teapot);
 		SDL_GL_SwapWindow(w);
 		SDL_Delay(1000/FPS);
 	}
@@ -57,6 +58,9 @@ int handleEvents(bool *shouldClose, camera * cam, Uint32 * buttonsHeld)
 			case SDL_KEYDOWN:
 				switch(event.key.keysym.scancode)
 				{
+					case SDL_SCANCODE_ESCAPE:
+						(*shouldClose) = true;
+						return eventCount;
 					case SDL_SCANCODE_W:
 						(*buttonsHeld) |= CAMERA_MOVE_FORWARD;
 						break;

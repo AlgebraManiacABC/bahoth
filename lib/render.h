@@ -9,6 +9,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <cglm/cglm.h>
 #include "camera.h"
+#include "stl.h"
 
 //	What am I rendering? (in a hypothetical renderAll() function)
 //
@@ -24,14 +25,16 @@
 //	 - Game time, etc.
 //	 - Indicators
 
-void renderAll(GLuint shaderProgram, camera cam, float aspectRatio);
+void renderAll(GLuint shaderProgram, camera cam);
 
-void renderTable(GLuint shaderProgram, camera cam, float aspectRatio);
+void renderTable(GLuint shaderProgram, camera cam);
 //===//
-void renderTiles(GLuint shaderProgram, camera cam, float aspectRatio);
-	void renderTile(GLuint shaderProgram, camera cam, float aspectRatio);
+void renderTiles(GLuint shaderProgram, camera cam);
+	void renderTile(GLuint shaderProgram, camera cam);
 void renderPlayerInventories();
 void renderTableExtras();
+
+void renderSTL(GLuint shaderProgram, camera cam, STL stl);
 //===//
 
 void renderUI();

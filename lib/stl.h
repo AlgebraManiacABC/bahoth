@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <cglm/cglm.h>
+#include <GL/glew.h>
 
 #define STL_Y 0
 #define STL_X 1
@@ -12,11 +13,11 @@
 
 typedef struct STL_triangle
 {
-	vec3 normal;
+	//vec3 normal;
 	vec3 v1;
 	vec3 v2;
 	vec3 v3;
-	Uint16 attribByteCount;
+	//Uint16 attribByteCount;
 
 }	STL_triangle_s, *STL_triangle, *STL_triangles;
 

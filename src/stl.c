@@ -48,9 +48,10 @@ STL loadSTLFromFile(const char * filename)
 		}
 		for(int i=0; i<stl->triangleCount; i++)
 		{
-			//size_t bytes;
-			fread(&(stl->triangles[i]),sizeof(float),12,fp);
-			fread(&(stl->triangles[i].attribByteCount),sizeof(Uint16),1,fp);
+			fseek(fp,sizeof(vec3),SEEK_CUR);
+			fread(&(stl->triangles[i]),sizeof(vec3),3,fp);
+			fseek(fp,sizeof(Uint16),SEEK_CUR);
+			//fread(&(stl->triangles[i].attribByteCount),sizeof(Uint16),1,fp);
 		}
 	}
 	else	//	Ascii
@@ -62,6 +63,11 @@ STL loadSTLFromFile(const char * filename)
 	}
 
 	fclose(fp);
+
+	GLuint vertexData;
+	glGenBuffers(1,&vertexData);
+	glBindBuffer(GL_ARRAY_BUFFER,vertexData);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(STL_triangle_s)*(stl->triangleCount),stl->triangles,GL_STATIC_DRAW);
 
 	return stl;
 }
