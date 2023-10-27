@@ -49,5 +49,8 @@ int initWindow(Uint32 SDL_initFlags,
 		return EXIT_FAILURE;
 	}
 
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback,0);
+
 	return EXIT_SUCCESS;
 }

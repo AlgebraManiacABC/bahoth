@@ -13,10 +13,12 @@
 
 typedef struct STL_triangle
 {
-	//vec3 normal;
 	vec3 v1;
+	vec3 normal1;
 	vec3 v2;
+	vec3 normal2;
 	vec3 v3;
+	vec3 normal3;
 	//Uint16 attribByteCount;
 
 }	STL_triangle_s, *STL_triangle, *STL_triangles;

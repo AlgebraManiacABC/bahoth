@@ -34,7 +34,7 @@ void gameLoop(SDL_Window *w)
 		if(shouldClose) return;
 		moveCamera(&cam,buttonsHeld);
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//	Need to send camera position to renderAll eventually
 		//renderAll(sp,cam);
 		renderSTL(sp,cam,teapot);

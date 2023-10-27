@@ -1,6 +1,22 @@
 #include "render.h"
 #include "game.h"
 
+bool isWireframe = false;
+
+void toggleWireframe()
+{
+	if(isWireframe)
+	{
+		isWireframe = false;
+		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	}
+	else
+	{
+		isWireframe = true;
+		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+	}
+}
+
 void renderAll(GLuint shaderProgram, camera cam)
 {
 	renderTable(shaderProgram, cam);
@@ -116,22 +132,22 @@ void renderSTL(GLuint shaderProgram, camera cam, STL stl)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(STL_triangle_s), (void*)(sizeof(vec3)));
 	glEnableVertexAttribArray(0);
 
-	//glDrawArrays(GL_TRIANGLES,0,9438+1599);
+	glDrawArrays(GL_TRIANGLES,0,9438+1598);
 
-	GLuint indices[] = {0,1,2};
+	//GLuint indices[] = {0,1,2};
 
-	GLuint vertexIndices;
-	glGenBuffers(1,&vertexIndices);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vertexIndices);
+	//GLuint vertexIndices;
+	//glGenBuffers(1,&vertexIndices);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vertexIndices);
 
-	for(int i=0; i<(stl->triangleCount>1000?1000:stl->triangleCount); i++)
-	{
-		indices[0] = 0 + (i * 3);
-		indices[1] = 1 + (i * 3);
-		indices[2] = 2 + (i * 3);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
-		glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_INT,NULL);
-	}
+	//for(int i=0; i<(stl->triangleCount>3632?3632:stl->triangleCount); i++)
+	//{
+	//	indices[0] = 0 + (i * 3);
+	//	indices[1] = 1 + (i * 3);
+	//	indices[2] = 2 + (i * 3);
+	//	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
+	//	glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_INT,NULL);
+	//}
 }
 
 //============================//

@@ -48,8 +48,12 @@ STL loadSTLFromFile(const char * filename)
 		}
 		for(int i=0; i<stl->triangleCount; i++)
 		{
-			fseek(fp,sizeof(vec3),SEEK_CUR);
-			fread(&(stl->triangles[i]),sizeof(vec3),3,fp);
+			fread(&(stl->triangles[i].normal1),sizeof(vec3),1,fp);
+			glm_vec3_copy(stl->triangles[i].normal1,stl->triangles[i].normal2);
+			glm_vec3_copy(stl->triangles[i].normal1,stl->triangles[i].normal3);
+			fread(&(stl->triangles[i].v1),sizeof(vec3),1,fp);
+			fread(&(stl->triangles[i].v2),sizeof(vec3),1,fp);
+			fread(&(stl->triangles[i].v3),sizeof(vec3),1,fp);
 			fseek(fp,sizeof(Uint16),SEEK_CUR);
 			//fread(&(stl->triangles[i].attribByteCount),sizeof(Uint16),1,fp);
 		}
