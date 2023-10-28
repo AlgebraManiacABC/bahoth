@@ -14,11 +14,13 @@ void gameLoop(SDL_Window *w)
 	SDL_GetWindowSize(w,&ww,&wh);
 	float aspectRatio = ww/wh;
 	STL teapot = loadSTLFromFile("../teapot.stl");
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CW);
-	//glCullFace(GL_BACK);
+	rotateSTL(teapot,(vec3){0,glm_rad(-90),0});
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 	GLuint vs = createShader("../src/shaders/transform.vert",GL_VERTEX_SHADER);
-	GLuint fs = createShader("../src/shaders/white.frag",GL_FRAGMENT_SHADER);
+	GLuint fs = createShader("../src/shaders/light.frag",GL_FRAGMENT_SHADER);
 	GLuint sp = createProgram(2,vs,fs);
 	glUseProgram(sp);
 	//glClearColor(1.0f,1.0f,1.0f,1.0f);

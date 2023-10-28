@@ -28,7 +28,8 @@ typedef struct STL
 	Uint32 triangleCount;
 	STL_triangles triangles;
 	vec3 size;	//	Diffs between max/min x/y/z
-	vec3 pos;	//	Position in scene
+	mat4 modelMatrix;
+	GLuint vertexBuffer;
 
 }	STL_s, *STL;
 
@@ -36,6 +37,9 @@ typedef struct STL
 STL loadSTLFromFile(const char * filename);
 
 void placeSTL(STL stl, vec3 pos);
+void translateSTL(STL stl, vec3 pos);
+
+void rotateSTL(STL stl, vec3 rot);
 
 void scaleSTLTo(STL stl, Uint32 dir, float value);
 void scaleSTLBy(STL stl, Uint32 dir, float value);

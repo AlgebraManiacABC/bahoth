@@ -80,14 +80,14 @@ void moveCamera(camera * cam, Uint32 cameraBitfield)
 	{
 		//	Angle camera up
 		cam->pitch += (CAM_UPF);
-		if(cam->pitch > glm_rad(90))
-			cam->pitch = glm_rad(90);
+		if(cam->pitch >= glm_rad(90))
+			cam->pitch = glm_rad(90 - 0.001f);
 	}
 	else if(cameraBitfield & CAMERA_PITCH_DOWN)
 	{
 		//	Angle camera down
 		cam->pitch -= (CAM_UPF);
-		if(cam->pitch < glm_rad(-90))
-			cam->pitch = glm_rad(-90);
+		if(cam->pitch <= glm_rad(-90))
+			cam->pitch = glm_rad(-90 + 0.001f);
 	}
 }

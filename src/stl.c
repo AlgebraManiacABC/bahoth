@@ -16,9 +16,7 @@ STL loadSTLFromFile(const char * filename)
 		return NULL;
 	}
 
-	stl->pos[0] = 0.0f;
-	stl->pos[1] = 0.0f;
-	stl->pos[2] = 0.0f;
+	glm_mat4_copy(GLM_MAT4_IDENTITY,stl->modelMatrix);
 
 	//vec3 min = {0,0,0};
 	//vec3 max = {0,0,0};
@@ -68,16 +66,36 @@ STL loadSTLFromFile(const char * filename)
 
 	fclose(fp);
 
-	GLuint vertexData;
-	glGenBuffers(1,&vertexData);
-	glBindBuffer(GL_ARRAY_BUFFER,vertexData);
+	glGenBuffers(1,&stl->vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER,stl->vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER,sizeof(STL_triangle_s)*(stl->triangleCount),stl->triangles,GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,3/*floats per vertex*/,GL_FLOAT,GL_FALSE,sizeof(vec3)*2/*size of data per vertex*/,NULL/*Positional data first*/);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,3/*floats per normal*/,GL_FLOAT,GL_FALSE,sizeof(vec3)*2/*size of data per vertex*/,(void*)sizeof(vec3)/*Normal data second*/);
+
+	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 	return stl;
 }
 
 void placeSTL(STL stl, vec3 pos)
 {
+	glm_mat4_copy(GLM_MAT4_IDENTITY,stl->modelMatrix);
+	glm_translate(stl->modelMatrix,pos);
+}
+
+void translateSTL(STL stl, vec3 pos)
+{
+	glm_translate(stl->modelMatrix,pos);
+}
+
+void rotateSTL(STL stl, vec3 rot)
+{
+	glm_rotate_y(stl->modelMatrix,rot[0],stl->modelMatrix);
+	glm_rotate_x(stl->modelMatrix,rot[1],stl->modelMatrix);
+	glm_rotate_z(stl->modelMatrix,rot[2],stl->modelMatrix);
 }
 
 void scaleSTLTo(STL stl, Uint32 dir, float value)

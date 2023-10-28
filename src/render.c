@@ -104,10 +104,6 @@ void renderSTL(GLuint shaderProgram, camera cam, STL stl)
 {
 	glUseProgram(shaderProgram);
 
-	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	mat4 modelMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_mat4_mul(translationMatrix,rotationMatrix,modelMatrix);
 	mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
 	mat4 projectionMatrix = GLM_MAT4_IDENTITY_INIT;
 	mat4 mvpMatrix = GLM_MAT4_IDENTITY_INIT;
@@ -121,18 +117,12 @@ void renderSTL(GLuint shaderProgram, camera cam, STL stl)
 	glm_look((vec3){cam.x,cam.y,cam.z},dir,worldUp,viewMatrix);
 	glm_perspective(glm_rad(90),cam.ar,0.1f,100.0f,projectionMatrix);
 	glm_mat4_mul(projectionMatrix,viewMatrix,mvpMatrix);
-	glm_mat4_mul(mvpMatrix,modelMatrix,mvpMatrix);
+	glm_mat4_mul(mvpMatrix,stl->modelMatrix,mvpMatrix);
 	glUniformMatrix4fv(trLoc,1,GL_FALSE,(float*)mvpMatrix);
 
-	GLuint vertexData;
-	glGenBuffers(1,&vertexData);
-	glBindBuffer(GL_ARRAY_BUFFER,vertexData);
-	glBufferData(GL_ARRAY_BUFFER,sizeof(STL_triangle_s)*(stl->triangleCount),stl->triangles,GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(STL_triangle_s), (void*)(sizeof(vec3)));
-	glEnableVertexAttribArray(0);
-
-	glDrawArrays(GL_TRIANGLES,0,9438+1598);
+	glBindBuffer(GL_ARRAY_BUFFER,stl->vertexBuffer);
+	glDrawArrays(GL_TRIANGLES,0,stl->triangleCount * 3);
+	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 	//GLuint indices[] = {0,1,2};
 
