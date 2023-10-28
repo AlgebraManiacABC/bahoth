@@ -1,5 +1,17 @@
 #include "stl.h"
 #include "debug.h"
+#include "game.h"
+
+void updateMaxMin(vec3 v, vec3 max, vec3 min)
+{
+	if(v[0] > max[0]) max[0] = v[0];
+	if(v[1] > max[1]) max[1] = v[1];
+	if(v[2] > max[2]) max[2] = v[2];
+
+	if(v[0] < min[0]) min[0] = v[0];
+	if(v[1] < min[1]) min[1] = v[1];
+	if(v[2] < min[2]) min[2] = v[2];
+}
 
 STL loadSTLFromFile(const char * filename)
 {
@@ -18,8 +30,8 @@ STL loadSTLFromFile(const char * filename)
 
 	glm_mat4_copy(GLM_MAT4_IDENTITY,stl->modelMatrix);
 
-	//vec3 min = {0,0,0};
-	//vec3 max = {0,0,0};
+	vec3 min = {0,0,0};
+	vec3 max = {0,0,0};
 
 	FILE * fp = fopen(filename,"rb");
 	if(!fp)
@@ -50,8 +62,11 @@ STL loadSTLFromFile(const char * filename)
 			glm_vec3_copy(stl->triangles[i].normal1,stl->triangles[i].normal2);
 			glm_vec3_copy(stl->triangles[i].normal1,stl->triangles[i].normal3);
 			fread(&(stl->triangles[i].v1),sizeof(vec3),1,fp);
+			updateMaxMin(stl->triangles[i].v1,max,min);
 			fread(&(stl->triangles[i].v2),sizeof(vec3),1,fp);
+			updateMaxMin(stl->triangles[i].v2,max,min);
 			fread(&(stl->triangles[i].v3),sizeof(vec3),1,fp);
+			updateMaxMin(stl->triangles[i].v3,max,min);
 			fseek(fp,sizeof(Uint16),SEEK_CUR);
 			//fread(&(stl->triangles[i].attribByteCount),sizeof(Uint16),1,fp);
 		}
@@ -63,6 +78,8 @@ STL loadSTLFromFile(const char * filename)
 		free(stl);
 		return NULL;
 	}
+
+	glm_vec3_sub(max,min,stl->size);
 
 	fclose(fp);
 
@@ -93,15 +110,112 @@ void translateSTL(STL stl, vec3 pos)
 
 void rotateSTL(STL stl, vec3 rot)
 {
-	glm_rotate_y(stl->modelMatrix,rot[0],stl->modelMatrix);
-	glm_rotate_x(stl->modelMatrix,rot[1],stl->modelMatrix);
-	glm_rotate_z(stl->modelMatrix,rot[2],stl->modelMatrix);
+	mat4 roty = GLM_MAT4_IDENTITY_INIT;
+	mat4 rotx = GLM_MAT4_IDENTITY_INIT;
+	mat4 rotz = GLM_MAT4_IDENTITY_INIT;
+	glm_rotate_y(GLM_MAT4_IDENTITY,rot[0],roty);
+	glm_rotate_x(GLM_MAT4_IDENTITY,rot[1],rotx);
+	glm_rotate_z(GLM_MAT4_IDENTITY,rot[2],rotz);
+	glm_mat4_mul(stl->modelMatrix,rotz,stl->modelMatrix);
+	glm_mat4_mul(rotx,roty,rotx);
+	glm_mat4_mul(stl->modelMatrix,rotx,stl->modelMatrix);
+}
+
+void getSTLDimensionRatio(STL stl, vec3 ratio)
+{
+	GLuint max_index = 0;
+	if(stl->size[1] > stl->size[max_index]) max_index = 1;
+	if(stl->size[2] > stl->size[max_index]) max_index = 2;
+
+	ratio[0] = stl->size[0] / stl->size[max_index];
+	ratio[1] = stl->size[1] / stl->size[max_index];
+	ratio[2] = stl->size[2] / stl->size[max_index];
 }
 
 void scaleSTLTo(STL stl, Uint32 dir, float value)
 {
+	//	Scale down all dimensions equally so the max length is 1.0
+	vec3 ratios = {0};
+	getSTLDimensionRatio(stl,ratios);
+	//	Scale everything down to (1,1,1)
+	vec3 unify = {0};
+	if(stl->size[0]) unify[0] = (1/stl->size[0]);
+	if(stl->size[1]) unify[1] = (1/stl->size[1]);
+	if(stl->size[2]) unify[2] = (1/stl->size[2]);
+	glm_scale(stl->modelMatrix,unify);
+	//	Scale everything back up to where it needs to be
+	vec3 scale = {1.0, 1.0, 1.0};
+	switch(dir)
+	{
+		case STL_Y:
+			scale[0] = value;
+			break;
+		case STL_X:
+			scale[1] = value;
+			break;
+		case STL_Z:
+			scale[2] = value;
+			break;
+		default:
+			scale[0] = value * ratios[0];
+			scale[1] = value * ratios[1];
+			scale[2] = value * ratios[2];
+			break;
+	}
+	glm_scale(stl->modelMatrix,scale);
 }
 
 void scaleSTLBy(STL stl, Uint32 dir, float value)
 {
+	vec3 scale = {1.0, 1.0, 1.0};
+	switch(dir)
+	{
+		case STL_Y:
+			scale[0] = value;
+			break;
+		case STL_X:
+			scale[1] = value;
+			break;
+		case STL_Z:
+			scale[2] = value;
+			break;
+		default:
+			scale[0] = value;
+			scale[1] = value;
+			scale[2] = value;
+			break;
+	}
+	glm_scale(stl->modelMatrix,scale);
+}
+
+void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y)
+{
+	if( (buttonsHeld & MODEL_SCALE_UP) && !(buttonsHeld & MODEL_SCALE_DOWN) )
+	{
+		scaleSTLBy(stl,STL_ALL,1.10);
+	}
+	else if( (buttonsHeld & MODEL_SCALE_DOWN) && !(buttonsHeld & MODEL_SCALE_UP) )
+	{
+		scaleSTLBy(stl,STL_ALL,1/1.10);
+	}
+
+	int oldx = *x, oldy = *y;
+
+	Uint32 mouseState = SDL_GetMouseState(x,y);
+	static bool dragging = false;
+	if(mouseState & SDL_BUTTON_LEFT)
+	{
+		dragging = true;
+	}
+	else
+	{
+		dragging = false;
+	}
+
+	int dx = (*x-oldx), dy = (*y-oldy);
+	if(dragging)
+	{
+		float dragFactor = 0.5f;
+		rotateSTL(stl,(vec3){0, -dragFactor*glm_rad(dy), dragFactor*glm_rad(dx)});
+	}
 }

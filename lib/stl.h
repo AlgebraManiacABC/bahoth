@@ -39,9 +39,17 @@ STL loadSTLFromFile(const char * filename);
 void placeSTL(STL stl, vec3 pos);
 void translateSTL(STL stl, vec3 pos);
 
+/**
+ * Rotates STL `stl` by yaw, then pitch, then roll, as given in `rot`
+ * 
+ * @param stl The STL to be rotated
+ * @param rot a vec3 containing, in order, yaw, pitch, and roll
+ */
 void rotateSTL(STL stl, vec3 rot);
 
 void scaleSTLTo(STL stl, Uint32 dir, float value);
 void scaleSTLBy(STL stl, Uint32 dir, float value);
+
+void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y);
 
 #endif

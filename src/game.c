@@ -27,6 +27,7 @@ void gameLoop(SDL_Window *w)
 	trLoc = glGetUniformLocation(sp,"transform");
 
 	camera cam = initCamera(aspectRatio);
+	int x, y;
 
 	Uint32 buttonsHeld = (0b0);
 	bool shouldClose = false;
@@ -35,6 +36,7 @@ void gameLoop(SDL_Window *w)
 		(void)handleEvents(&shouldClose, &cam, &buttonsHeld);
 		if(shouldClose) return;
 		moveCamera(&cam,buttonsHeld);
+		moveSTL(teapot,buttonsHeld,&x,&y);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//	Need to send camera position to renderAll eventually
@@ -93,6 +95,12 @@ int handleEvents(bool *shouldClose, camera * cam, Uint32 * buttonsHeld)
 					case SDL_SCANCODE_DOWN:
 						(*buttonsHeld) |= CAMERA_PITCH_DOWN;
 						break;
+					case SDL_SCANCODE_PAGEDOWN:
+						(*buttonsHeld) |= MODEL_SCALE_DOWN;
+						break;
+					case SDL_SCANCODE_PAGEUP:
+						(*buttonsHeld) |= MODEL_SCALE_UP;
+						break;
 					default:
 						break;
 				}
@@ -129,6 +137,12 @@ int handleEvents(bool *shouldClose, camera * cam, Uint32 * buttonsHeld)
 						break;
 					case SDL_SCANCODE_DOWN:
 						(*buttonsHeld) &= ~CAMERA_PITCH_DOWN;
+						break;
+					case SDL_SCANCODE_PAGEDOWN:
+						(*buttonsHeld) &= ~MODEL_SCALE_DOWN;
+						break;
+					case SDL_SCANCODE_PAGEUP:
+						(*buttonsHeld) &= ~MODEL_SCALE_UP;
 						break;
 					default:
 						break;

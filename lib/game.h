@@ -12,16 +12,28 @@
 #include <time.h>
 #include "camera.h"
 
-#define CAMERA_MOVE_LEFT     (0b0000000001)
-#define CAMERA_MOVE_RIGHT    (0b0000000010)
-#define CAMERA_MOVE_FORWARD  (0b0000000100)
-#define CAMERA_MOVE_BACKWARD (0b0000001000)
-#define CAMERA_MOVE_UP       (0b0000010000)
-#define CAMERA_MOVE_DOWN     (0b0000100000)
-#define CAMERA_YAW_LEFT      (0b0001000000)
-#define CAMERA_YAW_RIGHT     (0b0010000000)
-#define CAMERA_PITCH_UP      (0b0100000000)
-#define CAMERA_PITCH_DOWN    (0b1000000000)
+#define CAMERA_MOVE_LEFT     (1)
+#define CAMERA_MOVE_RIGHT    (1<<1)
+#define CAMERA_MOVE_FORWARD  (1<<2)
+#define CAMERA_MOVE_BACKWARD (1<<3)
+#define CAMERA_MOVE_UP       (1<<4)
+#define CAMERA_MOVE_DOWN     (1<<5)
+#define CAMERA_YAW_LEFT      (1<<6)
+#define CAMERA_YAW_RIGHT     (1<<7)
+#define CAMERA_PITCH_UP      (1<<8)
+#define CAMERA_PITCH_DOWN    (1<<9)
+
+#define MODEL_YAW_POSITIVE   (1<<10)
+#define MODEL_YAW_NEGATIVE   (1<<11)
+#define MODEL_PITCH_POSITIVE (1<<12)
+#define MODEL_PITCH_NEGATIVE (1<<13)
+#define MODEL_ROLL_POSITIVE  (1<<14)
+#define MODEL_ROLL_NEGATIVE  (1<<15)
+#define MODEL_SCALE_UP       (1<<16)
+#define MODEL_SCALE_DOWN     (1<<17)
+
+#define LEFT_MOUSE_DOWN      (1<<18)
+#define RIGHT_MOUSE_DOWN     (1<<19)
 
 #define FPS (60.0f)
 #define CAM_UPS (1.0f)	//	Units per second
