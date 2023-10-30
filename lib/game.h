@@ -39,6 +39,9 @@
 #define CAM_UPS (1.0f)	//	Units per second
 #define CAM_UPF (CAM_UPS/FPS)	//	Units per frame
 
+#define NEARZ (0.1f)
+#define FARZ (100.0f)
+
 typedef struct tile
 {
 	float x;
@@ -48,6 +51,7 @@ typedef struct tile
 
 extern float tileWidth;
 extern GLuint trLoc;
+extern GLuint mmLoc;
 extern vec3 worldUp;
 
 /**

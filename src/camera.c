@@ -17,6 +17,34 @@ camera initCamera(float aspectRatio)
 	return cam;
 }
 
+void getViewMatrix(camera cam, mat4 viewMatrix)
+{
+	vec3 dir =
+	{
+		cosf(cam.pitch) * sinf(cam.yaw),
+		sinf(cam.pitch),
+		cosf(cam.pitch) * cosf(cam.yaw)
+	};
+
+	glm_look((vec3){cam.x,cam.y,cam.z},dir,worldUp,viewMatrix);
+}
+
+void getProjectionMatrix(camera cam, float fovy, mat4 projMatrix)
+{
+	glm_perspective(fovy,cam.ar,NEARZ,FARZ,projMatrix);
+}
+
+void getModelViewProjectionMatrix(camera cam, float fovy, mat4 modelMatrix, mat4 mvpMatrix)
+{
+	mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
+	getViewMatrix(cam,viewMatrix);
+	mat4 projMatrix = GLM_MAT4_IDENTITY_INIT;
+	getProjectionMatrix(cam,fovy,projMatrix);
+
+	glm_mat4_mul(projMatrix,viewMatrix,mvpMatrix);
+	glm_mat4_mul(mvpMatrix,modelMatrix,mvpMatrix);
+}
+
 void updateCameraAspectRatio(camera * cam, float aspectRatio)
 {
 	cam->ar = aspectRatio;

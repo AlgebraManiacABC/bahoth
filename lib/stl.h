@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <cglm/cglm.h>
 #include <GL/glew.h>
+#include "camera.h"
 
 #define STL_Y 0
 #define STL_X 1
@@ -47,9 +48,11 @@ void translateSTL(STL stl, vec3 pos);
  */
 void rotateSTL(STL stl, vec3 rot);
 
+float arcballGet(vec2 screenPosi, vec2 screenPosf, int ww, int wh, vec3 rotationAxis);
+
 void scaleSTLTo(STL stl, Uint32 dir, float value);
 void scaleSTLBy(STL stl, Uint32 dir, float value);
 
-void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y);
+void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y, int ww, int wh, camera cam);
 
 #endif

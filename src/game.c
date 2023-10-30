@@ -5,6 +5,7 @@
 #include "stl.h"
 
 GLuint trLoc;
+GLuint mmLoc;
 float tileWidth = 1.0f;
 vec3 worldUp = {0.0f, 1.0f, 0.0f};
 
@@ -25,6 +26,7 @@ void gameLoop(SDL_Window *w)
 	glUseProgram(sp);
 	//glClearColor(1.0f,1.0f,1.0f,1.0f);
 	trLoc = glGetUniformLocation(sp,"transform");
+	mmLoc = glGetUniformLocation(sp,"modelMatrix");
 
 	camera cam = initCamera(aspectRatio);
 	int x, y;
@@ -36,7 +38,7 @@ void gameLoop(SDL_Window *w)
 		(void)handleEvents(&shouldClose, &cam, &buttonsHeld);
 		if(shouldClose) return;
 		moveCamera(&cam,buttonsHeld);
-		moveSTL(teapot,buttonsHeld,&x,&y);
+		moveSTL(teapot,buttonsHeld,&x,&y,ww,wh,cam);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//	Need to send camera position to renderAll eventually

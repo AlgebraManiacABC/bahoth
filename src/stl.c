@@ -121,6 +121,53 @@ void rotateSTL(STL stl, vec3 rot)
 	glm_mat4_mul(stl->modelMatrix,rotx,stl->modelMatrix);
 }
 
+float arcballGet(vec2 posi, vec2 posf, int ww, int wh, vec3 axis)
+{
+	posi[0] = (posi[0] / (ww/2.0)) - 1;
+	posi[1] = (posi[1] / -(ww/2.0)) + 1;
+	posf[0] = (posf[0] / (ww/2.0)) - 1;
+	posf[1] = (posf[1] / -(ww/2.0)) + 1;
+	//fprintf(stderr,"Normalized Screen Pos: { %.2ff, %.2ff} -> { %.2ff, %.2ff }\n",posi[0],posi[1],posf[0],posf[1]);
+
+	//	Pythagorean theorum: 1 = x*x + y*y + z*z
+
+	bool normalizedi = false;
+	bool normalizedf = false;
+	//	First point
+	vec3 veci = {posi[0], posi[1], 0};
+	float sqrPosi = (posi[0]*posi[0]) + (posi[1]*posi[1]);
+	if(sqrPosi <= 1.0f)
+	//	Point on cube, safe to sqrt
+		veci[2] = sqrt(1 - sqrPosi);
+	else
+	{
+	//	Off cube, unsafe to sqrt; just get closest point
+		glm_normalize(veci);
+		normalizedi = true;
+	}
+
+	//	Second point
+	vec3 vecf = {posf[0], posf[1], 0};
+	float sqrPosf = (posf[0]*posf[0]) + (posf[1]*posf[1]);
+	if(sqrPosf <= 1.0f)
+		vecf[2] = sqrt(1 - sqrPosf);
+	else
+	{
+		glm_normalize(vecf);
+		normalizedf = true;
+	}
+	(void)(normalizedf & normalizedi);
+
+	//fprintf(stderr,"i{ %.2ff, %.2ff, %.2ff } || f{ %.2ff, %.2ff, %.2ff }\n",veci[0],veci[1],veci[2],vecf[0],vecf[1],vecf[2]);
+	float dot = glm_dot(veci,vecf);
+	float spinFactor = 1.0f;
+	float angle = spinFactor * acos(dot > 1.0? (dot < -1.0? -1.0: 1.0): dot);
+	glm_cross(veci,vecf,axis);
+	//fprintf(stderr,"Arcball created: Angle = %.2ff; { %.2ff, %.2ff, %.2ff } (dot was %.2ff)%c%c%c\n",glm_deg(angle),axis[0],axis[1],axis[2], dot,
+		//(normalizedi?'i':' '),(normalizedf?'f':' '),(dot>1.0 || dot < -1.0?'!':' '));
+	return angle;
+}
+
 void getSTLDimensionRatio(STL stl, vec3 ratio)
 {
 	GLuint max_index = 0;
@@ -188,7 +235,7 @@ void scaleSTLBy(STL stl, Uint32 dir, float value)
 	glm_scale(stl->modelMatrix,scale);
 }
 
-void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y)
+void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y, int ww, int wh, camera cam)
 {
 	if( (buttonsHeld & MODEL_SCALE_UP) && !(buttonsHeld & MODEL_SCALE_DOWN) )
 	{
@@ -199,23 +246,47 @@ void moveSTL(STL stl, Uint32 buttonsHeld, int *x, int *y)
 		scaleSTLBy(stl,STL_ALL,1/1.10);
 	}
 
-	int oldx = *x, oldy = *y;
+	static bool dragging = false;
+	static int oldx, oldy;
+	static mat4 oldModelMatrix;
+	if(!dragging)
+	{
+		oldx = *x;
+		oldy = *y;
+	}
 
 	Uint32 mouseState = SDL_GetMouseState(x,y);
-	static bool dragging = false;
 	if(mouseState & SDL_BUTTON_LEFT)
 	{
+		if(!dragging)
+		{
+			glm_mat4_copy(stl->modelMatrix,oldModelMatrix);
+		}
 		dragging = true;
 	}
 	else
-	{
 		dragging = false;
-	}
 
 	int dx = (*x-oldx), dy = (*y-oldy);
 	if(dragging)
 	{
-		float dragFactor = 0.5f;
-		rotateSTL(stl,(vec3){0, -dragFactor*glm_rad(dy), dragFactor*glm_rad(dx)});
+		if(!dx && !dy) return;
+		//float dragFactor = 0.5f;
+		//rotateSTL(stl,(vec3){0, -dragFactor*glm_rad(dy), dragFactor*glm_rad(dx)});
+		vec3 arcballAxis = {0};
+		float arcballAngle = arcballGet((vec2){oldx,oldy},(vec2){*x,*y},ww,wh,arcballAxis);
+		//	arcballAxis is currently in camera coordinates; need converted to object coordinates
+		mat4 modelViewMatrix;
+		getViewMatrix(cam,modelViewMatrix);
+		glm_mat4_mul(modelViewMatrix,oldModelMatrix,modelViewMatrix);
+		mat3 transformToObjectFromCamera;
+		glm_mat4_pick3(modelViewMatrix,transformToObjectFromCamera);
+		glm_mat3_inv(transformToObjectFromCamera,transformToObjectFromCamera);
+		glm_mat3_mulv(transformToObjectFromCamera,arcballAxis,arcballAxis);
+		//	arcballAxis should now be in object coordinates
+		mat4 newModelMatrix;
+		glm_mat4_copy(oldModelMatrix,newModelMatrix);
+		glm_rotate(newModelMatrix,arcballAngle,arcballAxis);
+		glm_mat4_copy(newModelMatrix,stl->modelMatrix);
 	}
 }

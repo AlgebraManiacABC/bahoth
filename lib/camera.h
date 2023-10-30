@@ -19,6 +19,10 @@ typedef struct camera
 
 camera initCamera(float aspectRatio);
 
+void getViewMatrix(camera cam, mat4 viewMatrix);
+void getProjectionMatrix(camera cam, float fovy, mat4 projMatrix);
+void getModelViewProjectionMatrix(camera cam, float fovy, mat4 modelMatrix, mat4 mvpMatrix);
+
 void updateCameraAspectRatio(camera * cam, float aspectRatio);
 
 void moveCamera(camera * cam, Uint32 buttonsHeld);

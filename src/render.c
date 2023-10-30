@@ -1,4 +1,5 @@
 #include "render.h"
+#include "camera.h"
 #include "game.h"
 
 bool isWireframe = false;
@@ -73,16 +74,9 @@ void renderTile(GLuint shaderProgram, camera cam)
 	mat4 modelMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_mat4_mul(translationMatrix,rotationMatrix,modelMatrix);
 	mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
+	getViewMatrix(cam,viewMatrix);
 	mat4 projectionMatrix = GLM_MAT4_IDENTITY_INIT;
 	mat4 mvpMatrix = GLM_MAT4_IDENTITY_INIT;
-	vec3 dir =
-	{
-		cosf(cam.pitch) * sinf(cam.yaw),
-		sinf(cam.pitch),
-		cosf(cam.pitch) * cosf(cam.yaw)
-	};
-
-	glm_look((vec3){cam.x,cam.y,cam.z},dir,worldUp,viewMatrix);
 	glm_perspective(glm_rad(90),cam.ar,0.1f,100.0f,projectionMatrix);
 	glm_mat4_mul(projectionMatrix,viewMatrix,mvpMatrix);
 	glm_mat4_mul(mvpMatrix,modelMatrix,mvpMatrix);
@@ -104,21 +98,10 @@ void renderSTL(GLuint shaderProgram, camera cam, STL stl)
 {
 	glUseProgram(shaderProgram);
 
-	mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
-	mat4 projectionMatrix = GLM_MAT4_IDENTITY_INIT;
 	mat4 mvpMatrix = GLM_MAT4_IDENTITY_INIT;
-	vec3 dir =
-	{
-		cosf(cam.pitch) * sinf(cam.yaw),
-		sinf(cam.pitch),
-		cosf(cam.pitch) * cosf(cam.yaw)
-	};
-
-	glm_look((vec3){cam.x,cam.y,cam.z},dir,worldUp,viewMatrix);
-	glm_perspective(glm_rad(90),cam.ar,0.1f,100.0f,projectionMatrix);
-	glm_mat4_mul(projectionMatrix,viewMatrix,mvpMatrix);
-	glm_mat4_mul(mvpMatrix,stl->modelMatrix,mvpMatrix);
+	getModelViewProjectionMatrix(cam,glm_rad(90),stl->modelMatrix,mvpMatrix);
 	glUniformMatrix4fv(trLoc,1,GL_FALSE,(float*)mvpMatrix);
+	glUniformMatrix4fv(mmLoc,1,GL_FALSE,(float*)stl->modelMatrix);
 
 	glBindBuffer(GL_ARRAY_BUFFER,stl->vertexBuffer);
 	glDrawArrays(GL_TRIANGLES,0,stl->triangleCount * 3);
