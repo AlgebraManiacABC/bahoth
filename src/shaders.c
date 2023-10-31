@@ -11,6 +11,11 @@ GLuint createShader(const char * shaderFilename, GLenum shaderType)
 		return 0;
 	}
 	fscanf(shaderFile,"%m[^\xff]",&shaderSource);
+	if(!shaderSource)
+	{
+		setError(ERR_CODE,ERR_NOMEM);
+		return 0;
+	}
 	fclose(shaderFile);
 	GLuint shaderID = glCreateShader(shaderType);
 	glShaderSource(shaderID,1,&shaderSource,NULL);

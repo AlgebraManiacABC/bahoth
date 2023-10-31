@@ -35,6 +35,12 @@ typedef struct STL
 }	STL_s, *STL;
 
 
+/**
+ * Loads an STL object from a file into memory as an `STL` struct 
+ * 
+ * @param filename the file to read
+ * @returns an `STL` struct, containing the triangle information, or `NULL` on failure
+ */
 STL loadSTLFromFile(const char * filename);
 
 void placeSTL(STL stl, vec3 pos);
