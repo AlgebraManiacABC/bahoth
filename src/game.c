@@ -3,6 +3,7 @@
 #include "shaders.h"
 #include "camera.h"
 #include "stl.h"
+#include "debug.h"
 
 GLuint trLoc;
 GLuint mmLoc;
@@ -14,15 +15,36 @@ void gameLoop(SDL_Window *w)
 	int ww, wh;
 	SDL_GetWindowSize(w,&ww,&wh);
 	float aspectRatio = ww/wh;
-	STL teapot = loadSTLFromFile("../teapot.stl");
+	const char * STLFilename = "../teapot.stl";
+	STL teapot = loadSTLFromFile(STLFilename);
+	if(!teapot)
+	{
+		fprintf(stderr,"Error loading STL %s: %s\n",STLFilename,getError());
+		return;
+	}
 	rotateSTL(teapot,(vec3){0,glm_rad(-90),0});
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-	GLuint vs = createShader("../src/shaders/transform.vert",GL_VERTEX_SHADER);
-	GLuint fs = createShader("../src/shaders/light.frag",GL_FRAGMENT_SHADER);
-	GLuint sp = createProgram(2,vs,fs);
+	GLuint transformShader = createShader("../src/shaders/transform.vert",GL_VERTEX_SHADER);
+	if(!transformShader)
+	{
+		fprintf(stderr,"Couldn't create transformShader: %s\n",getError());
+		return;
+	}
+	GLuint lightShader = createShader("../src/shaders/light.frag",GL_FRAGMENT_SHADER);
+	if(!lightShader)
+	{
+		fprintf(stderr,"Couldn't create lightFShader: %s\n",getError());
+		return;
+	}
+	GLuint sp = createProgram(2,transformShader,lightShader);
+	if(!sp)
+	{
+		fprintf(stderr,"Couldn't create shader program: %s\n",getError());
+		return;
+	}
 	glUseProgram(sp);
 	//glClearColor(1.0f,1.0f,1.0f,1.0f);
 	trLoc = glGetUniformLocation(sp,"transform");
