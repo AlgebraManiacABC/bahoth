@@ -14,7 +14,6 @@ void gameLoop(SDL_Window *w)
 {
 	int ww, wh;
 	SDL_GetWindowSize(w,&ww,&wh);
-	float aspectRatio = ww/wh;
 	const char * STLFilename = "../teapot.stl";
 	STL teapot = loadSTLFromFile(STLFilename);
 	if(!teapot)
@@ -23,26 +22,13 @@ void gameLoop(SDL_Window *w)
 		return;
 	}
 	rotateSTL(teapot,(vec3){0,glm_rad(-90),0});
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	GLuint transformShader = createShader("../src/shaders/transform.vert",GL_VERTEX_SHADER);
-	if(!transformShader)
-	{
-		fprintf(stderr,"Couldn't create transformShader: %s\n",getError());
-		return;
-	}
-	GLuint lightShader = createShader("../src/shaders/light.frag",GL_FRAGMENT_SHADER);
-	if(!lightShader)
-	{
-		fprintf(stderr,"Couldn't create lightFShader: %s\n",getError());
-		return;
-	}
-	GLuint sp = createProgram(2,transformShader,lightShader);
+	initRenderer();
+	GLuint sp = createProgram(2,
+		createShader("../src/shaders/transform.vert",GL_VERTEX_SHADER),
+		createShader("../src/shaders/light.frag",GL_FRAGMENT_SHADER));
 	if(!sp)
 	{
-		fprintf(stderr,"Couldn't create shader program: %s\n",getError());
+		fprintf(stderr,"Error creating program: %s\n",getError());
 		return;
 	}
 	glUseProgram(sp);
@@ -50,7 +36,7 @@ void gameLoop(SDL_Window *w)
 	trLoc = glGetUniformLocation(sp,"transform");
 	mmLoc = glGetUniformLocation(sp,"modelMatrix");
 
-	camera cam = initCamera(aspectRatio);
+	camera cam = initCamera(ww/wh);
 	int x, y;
 
 	Uint32 buttonsHeld = (0b0);
@@ -124,6 +110,9 @@ int handleEvents(bool *shouldClose, camera * cam, Uint32 * buttonsHeld)
 						break;
 					case SDL_SCANCODE_PAGEUP:
 						(*buttonsHeld) |= MODEL_SCALE_UP;
+						break;
+					case SDL_SCANCODE_RETURN:
+						toggleWireframe();
 						break;
 					default:
 						break;

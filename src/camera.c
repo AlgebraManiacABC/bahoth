@@ -17,6 +17,10 @@ camera initCamera(float aspectRatio)
 	return cam;
 }
 
+void placeCamera(camera cam, vec3 pos, float pitch, float yaw)
+{
+}
+
 void getViewMatrix(camera cam, mat4 viewMatrix)
 {
 	vec3 dir =

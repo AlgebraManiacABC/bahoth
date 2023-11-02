@@ -25,6 +25,10 @@
 //	 - Game time, etc.
 //	 - Indicators
 
+void initRenderer(void);
+
+void toggleWireframe(void);
+
 void renderAll(GLuint shaderProgram, camera cam);
 
 void renderTable(GLuint shaderProgram, camera cam);
